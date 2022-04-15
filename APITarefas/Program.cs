@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,4 +16,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.MapGet("/", () => "Olá Mundo");
+
 app.Run();
+
+class Tarefa
+{
+    public int Id { get; set; }
+    public string? Nome { get; set; }
+    public bool IsConcluida { get; set; }
+}
+
+class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) :base(options)
+    {}
+
+    public DbSet<Tarefa> Tarefas => Set<Tarefa>();
+}
