@@ -23,6 +23,13 @@ app.MapGet("/", () => "Olá Mundo");
 
 app.MapGet("/tarefas", async (AppDbContext db) => await db.Tarefas.ToListAsync());
 
+app.MapPost("/tarefas", async (Tarefa tarefa, AppDbContext db) =>
+{
+    db.Tarefas.Add(tarefa);
+    await db.SaveChangesAsync();
+    return Results.Created($"/tarefas/{tarefa.Id}", tarefa);
+});
+
 app.Run();
 
 class Tarefa
