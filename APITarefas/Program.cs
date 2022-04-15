@@ -23,17 +23,29 @@ app.MapGet("/", () => "Lista de Tarefas");
 
 app.MapGet("/tarefas", async (AppDbContext db) => await db.Tarefas.ToListAsync());
 
-app.MapGet("tarefas/{id}", async(int id, AppDbContext db) =>
+app.MapGet("tarefas/{id}", async (int id, AppDbContext db) =>
     await db.Tarefas.FindAsync(id) is Tarefa tarefa ? Results.Ok(tarefa) : Results.NotFound());
 
 app.MapGet("/tarefas/concluida", async (AppDbContext db) => await db.Tarefas.Where(t => t.IsConcluida == true).ToListAsync());
-
 
 app.MapPost("/tarefas", async (Tarefa tarefa, AppDbContext db) =>
 {
     db.Tarefas.Add(tarefa);
     await db.SaveChangesAsync();
     return Results.Created($"/tarefas/{tarefa.Id}", tarefa);
+});
+
+app.MapPut("/tarefas/{id}", async (int id, Tarefa inputTarefa, AppDbContext db) =>
+{
+    var tarefa = await db.Tarefas.FindAsync(id);
+
+    if (tarefa is null) return Results.NotFound();
+
+    tarefa.Nome = inputTarefa.Nome;
+    tarefa.IsConcluida = inputTarefa.IsConcluida;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
 });
 
 app.Run();
@@ -47,8 +59,8 @@ class Tarefa
 
 class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) :base(options)
-    {}
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    { }
 
     public DbSet<Tarefa> Tarefas => Set<Tarefa>();
 }
