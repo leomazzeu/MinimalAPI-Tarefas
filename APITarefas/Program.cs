@@ -19,9 +19,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/", () => "Olá Mundo");
+app.MapGet("/", () => "Lista de Tarefas");
 
 app.MapGet("/tarefas", async (AppDbContext db) => await db.Tarefas.ToListAsync());
+
+app.MapGet("tarefas/{id}", async(int id, AppDbContext db) =>
+    await db.Tarefas.FindAsync(id) is Tarefa tarefa ? Results.Ok(tarefa) : Results.NotFound());
+
+app.MapGet("/tarefas/concluida", async (AppDbContext db) => await db.Tarefas.Where(t => t.IsConcluida == true).ToListAsync());
+
 
 app.MapPost("/tarefas", async (Tarefa tarefa, AppDbContext db) =>
 {
