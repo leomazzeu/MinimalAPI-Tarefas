@@ -21,6 +21,8 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/", () => "Olá Mundo");
 
+app.MapGet("/tarefas", async (AppDbContext db) => await db.Tarefas.ToListAsync());
+
 app.Run();
 
 class Tarefa
